@@ -111,14 +111,14 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <label class="flex flex-col p-3 rounded-xl border border-orange-200 bg-white cursor-pointer hover:border-orange-400 transition-all">
                                     <div class="flex justify-between items-center mb-1">
-                                        <span class="text-[10px] font-black text-orange-500 uppercase font-black">Family</span>
+                                        <span class="text-[10px] font-black text-orange-500 uppercase">Family</span>
                                         <input type="checkbox" id="has-kids" class="w-4 h-4 rounded text-orange-600">
                                     </div>
                                     <span class="text-[11px] font-bold text-gray-700 italic">Young Kids</span>
                                 </label>
                                 <label class="flex flex-col p-3 rounded-xl border border-orange-200 bg-white cursor-pointer hover:border-orange-400 transition-all">
                                     <div class="flex justify-between items-center mb-1">
-                                        <span class="text-[10px] font-black text-orange-500 uppercase font-black">Pets</span>
+                                        <span class="text-[10px] font-black text-orange-500 uppercase">Pets</span>
                                         <input type="checkbox" id="has-pets" class="w-4 h-4 rounded text-orange-600">
                                     </div>
                                     <span class="text-[11px] font-bold text-gray-700 italic">The Pack</span>
@@ -166,7 +166,7 @@
                             <span class="text-sm font-bold text-gray-700 font-black italic">Can we bring treats? 🦴</span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="survey-treats" class="sr-only peer">
-                                <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-6 after:transition-all"></div>
+                                <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border after:rounded-full after:h-5 after:w-6 after:transition-all"></div>
                             </label>
                         </div>
                     </div>
@@ -242,8 +242,8 @@
                                 <button id="btn-copy-link" class="text-[10px] font-black text-blue-600 uppercase hover:underline">Copy Profile Link</button>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-                                <button id="btn-questionnaire" class="p-4 bg-blue-600 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-50 italic">Stage 1: Resend</button>
-                                <button id="btn-followup" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic">Stage 2: Secrets</button>
+                                <button id="btn-questionnaire" class="p-4 bg-blue-600 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-50 italic">Resend Profile</button>
+                                <button id="btn-followup" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic">Security Secrets</button>
                                 <button id="btn-drip-3" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic font-black">Privacy Power</button>
                                 <button id="btn-drip-4" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic font-black">Final Nudge</button>
                             </div>
@@ -280,8 +280,8 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, arrayUnion, getDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- PUBLIC URL CONFIG ---
-        // Once you host on GitHub Pages, paste your live URL here.
-        const PUBLIC_APP_URL = ""; 
+        // Your live GitHub Pages URL:
+        const PUBLIC_APP_URL = "https://expanse-builders.github.io/Fencequote/"; 
 
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -405,7 +405,7 @@
                     </div>` : ''}
                     <p style="margin-top: 60px; font-size: 14px; color: #94a3b8; text-align: center; font-style: italic; border-top: 1px solid #f1f5f9; padding-top: 40px;">Protecting your Pack since 2024.</p>
                 </div>
-                ${ctaLink ? `<div style="padding: 20px 40px; text-align: center;"><p style="font-size: 10px; color: #cbd5e1; margin-bottom: 5px;">If the button above does not work, copy and paste this link:</p><p style="font-size: 10px; color: #3b82f6; word-break: break-all;">${ctaLink}</p></div>` : ''}
+                ${ctaLink ? `<div style="padding: 20px 40px; text-align: center;"><p style="font-size: 10px; color: #cbd5e1; margin-bottom: 5px;">If the button above does not work, copy and paste this link:</p><p style="font-size: 10px; color: #3b82f6; word-break: break-all; text-decoration: underline;">${ctaLink}</p></div>` : ''}
                 <div style="padding: 10px 30px 40px 30px; text-align: center;"><p style="margin: 0; font-size: 10px; color: #cbd5e1; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">Expanse Builders &copy; 2026 | Built for the Pack</p></div>
             </div>`;
         }
@@ -464,7 +464,7 @@
                 leads.forEach(lead => {
                     const el = document.createElement('div'); const prio = lead.hasKids || lead.hasPets;
                     el.className = `lead-card p-6 rounded-[2.5rem] border cursor-pointer transition-all ${currentLead?.id === lead.id ? 'bg-blue-50 border-blue-100 shadow-xl ring-8 ring-blue-50/50' : 'bg-white border-gray-100'}`;
-                    el.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="font-black text-gray-900 italic font-black uppercase">${lead.name}</span>${prio ? '<span class="bg-orange-100 text-orange-600 text-[8px] font-black px-2 py-1 rounded-full uppercase">Prio</span>' : ''}</div><p class="text-[10px] text-gray-400 font-bold uppercase truncate italic">${lead.address}</p>`;
+                    el.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="font-black text-gray-900 italic font-black uppercase tracking-tight">${lead.name}</span>${prio ? '<span class="bg-orange-100 text-orange-600 text-[8px] font-black px-2 py-1 rounded-full uppercase">Prio</span>' : ''}</div><p class="text-[10px] text-gray-400 font-bold uppercase truncate italic">${lead.address}</p>`;
                     el.onclick = () => selectLead(lead); list.appendChild(el);
                     if (currentLead?.id === lead.id) currentLead = lead;
                 });
@@ -515,17 +515,18 @@
                 try {
                     const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fence_leads'), data);
                     const surveyLink = `${getAbsoluteBaseUrl()}?view=survey&leadId=${docRef.id}`;
-                    const html = generateEmailHtml(data.name, `<p>We've received your strategy for <strong>${data.address}</strong>.</p><p>We've flagged this as a <strong>Priority Safety Perimeter</strong>. Click below to tell us about your pets and find a time for your measurement visit.</p>`, "Open Safety Profile", surveyLink);
+                    const content = `<p>We've received your strategy for <strong>${data.address}</strong>.</p><p>We've flagged this as a <strong>Priority Safety Perimeter</strong>. Click below to tell us about your pets and find a time for your measurement visit.</p>`;
+                    const html = generateEmailHtml(data.name, content, "Open Safety Profile", surveyLink);
                     await sendGmail(data.email, "Action Required: Your Safety Perimeter Profile", html);
                     document.getElementById('message-box').classList.remove('hidden');
                     document.getElementById('message-box').className = "mt-8 p-10 rounded-[3rem] bg-blue-600 text-white shadow-2xl";
-                    document.getElementById('message-box').innerHTML = `<h4 class="font-black text-2xl mb-2 italic uppercase font-black">STRATEGY SECURED.</h4><p class="text-sm font-bold opacity-90 leading-relaxed font-bold italic">Check your inbox. Complete your Safety Profile to secure your priority window.</p>`;
+                    document.getElementById('message-box').innerHTML = `<h4 class="font-black text-2xl mb-2 italic uppercase font-black font-black">STRATEGY SECURED.</h4><p class="text-sm font-bold opacity-90 leading-relaxed font-bold italic font-black">Check your inbox. Complete your Safety Profile to secure your priority window.</p>`;
                     document.getElementById('lead-capture-form').classList.add('hidden');
                     loadPipeline();
                 } catch (err) { submitBtn.disabled = false; submitBtn.textContent = "Generate My Strategy"; }
             };
 
-            document.getElementById('btn-copy-link').onclick = () => { if (!currentLead) return; const link = `${getAbsoluteBaseUrl()}?view=survey&leadId=${currentLead.id}`; const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); };
+            document.getElementById('btn-copy-link').onclick = () => { if (!currentLead) return; const link = `${getAbsoluteBaseUrl()}?view=survey&leadId=${currentLead.id}`; const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Survey link copied to clipboard!"); };
             document.getElementById('btn-questionnaire').onclick = async () => { const surveyLink = `${getAbsoluteBaseUrl()}?view=survey&leadId=${currentLead.id}`; const html = generateEmailHtml(currentLead.name, `<p>We're ready to design your perimeter at <strong>${currentLead.address}</strong>.</p><p>Please finalize your Safety Profile details below.</p>`, "Open Safety Profile", surveyLink); if (await sendGmail(currentLead.email, "Action Required: Your Safety Profile", html)) logActivity('Resent Safety Profile link', 'email'); };
             document.getElementById('btn-followup').onclick = async () => { const html = generateEmailHtml(currentLead.name, `<p>Did you know that 85% of home security starts at the perimeter?</p><p>A sturdy fence creates a psychological barrier that protects what's inside. Shall we proceed?</p>`, "Secure My Home", "mailto:info@expanse.builders"); if (await sendGmail(currentLead.email, "5 Secrets to Perimeter Security", html)) logActivity('Sent Drip 2: Security Secrets', 'email'); };
             document.getElementById('btn-drip-3').onclick = async () => { const html = generateEmailHtml(currentLead.name, `<p>Privacy isn't just about hiding—it's about feeling truly at home.</p><p>Imagine your yard as an acoustic sanctuary. That's the power of premium paling.</p>`, "See Our Work", "https://expanse.builders"); if (await sendGmail(currentLead.email, "The Value of Privacy", html)) logActivity('Sent Drip 3: Privacy Advantage', 'email'); };
