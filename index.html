@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expanse Builders | Premium Quoter & CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; color: #1e293b; }
+        h1, h2, h3, h4, .brand-font { font-family: 'Outfit', sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); }
+        .lead-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .lead-card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .pac-container { 
+            z-index: 99999 !important; 
+            border-radius: 24px; 
+            border: none;
+            margin-top: 10px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+            font-family: 'Inter', sans-serif !important;
+            padding: 10px;
+        }
+
+        .timeline-item::before { 
+            content: ''; position: absolute; left: 15px; top: 24px; bottom: -24px; 
+            width: 2px; background: #e2e8f0; 
+        }
+        .timeline-item:last-child::before { display: none; }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+        .btn-premium:hover:not(:disabled) {
+            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .option-card input:checked + div {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 z-[5000] flex items-center justify-between px-8">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200">E</div>
+            <span class="brand-font font-black text-blue-900 tracking-tighter text-xl uppercase italic">Expanse</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="view-toggle-btn" class="text-[10px] font-black text-gray-400 hover:text-blue-600 px-5 py-2 rounded-full border border-gray-100 transition-all uppercase tracking-widest">
+                CRM Access
+            </button>
+        </div>
+    </nav>
+
+    <!-- CUSTOMER VIEW -->
+    <div id="customer-view" class="pt-16 flex flex-col lg:flex-row h-screen">
+        <div class="lg:w-1/3 w-full glass-panel p-6 md:p-10 overflow-y-auto z-10 shadow-2xl relative border-r border-gray-100">
+            <div class="mb-8">
+                <span class="bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md mb-2 inline-block">Premium Paling Fences</span>
+                <h1 class="text-4xl font-black text-gray-900 leading-tight tracking-tighter italic">Safety. Privacy. Security.</h1>
+                <p class="text-gray-500 mt-2 font-medium">Building a sanctuary for your Pack.</p>
+            </div>
+
+            <div class="space-y-8">
+                <div>
+                    <label class="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3 italic">01. Locate Property</label>
+                    <div class="relative group">
+                        <input type="text" id="address-search" placeholder="Enter your address..." 
+                               class="w-full rounded-2xl border-gray-100 shadow-sm p-5 border focus:ring-4 focus:ring-blue-50 outline-none transition-all pr-12 text-lg font-bold group-hover:border-blue-200">
+                        <div class="absolute right-4 top-5 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+                    <div class="flex justify-between items-end relative z-10">
+                        <div>
+                            <p class="text-blue-400 text-[10px] uppercase font-black tracking-[0.2em] mb-1">Total Perimeter</p>
+                            <p id="length-display" class="text-3xl font-black brand-font tracking-tighter italic">0.00 m</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-blue-400 text-[10px] uppercase font-black tracking-[0.2em] mb-1">Instant Estimate</p>
+                            <p id="estimate-display" class="text-5xl font-black text-green-400 brand-font tracking-tighter italic">$0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lead-form-container" class="hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <h3 class="text-xl font-black text-gray-900 mb-6 tracking-tight uppercase italic font-black text-center">Secure Priority Lead Status</h3>
+                    <form id="lead-capture-form" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" id="name" placeholder="Full Name" required class="p-4 rounded-xl border border-gray-100 bg-gray-50/50 text-sm focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold">
+                            <input type="tel" id="phone" placeholder="Phone" required class="p-4 rounded-xl border border-gray-100 bg-gray-50/50 text-sm focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold">
+                        </div>
+                        <input type="email" id="email" placeholder="Email Address" required class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 text-sm focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold">
+                        
+                        <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100">
+                            <p class="text-[10px] font-black text-orange-600 mb-4 uppercase tracking-[0.1em]">Why is safety a priority?</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex flex-col p-3 rounded-xl border border-orange-200 bg-white cursor-pointer hover:border-orange-400 transition-all">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] font-black text-orange-500 uppercase font-black">Family</span>
+                                        <input type="checkbox" id="has-kids" class="w-4 h-4 rounded text-orange-600">
+                                    </div>
+                                    <span class="text-[11px] font-bold text-gray-700 italic">Young Kids</span>
+                                </label>
+                                <label class="flex flex-col p-3 rounded-xl border border-orange-200 bg-white cursor-pointer hover:border-orange-400 transition-all">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] font-black text-orange-500 uppercase font-black">Pets</span>
+                                        <input type="checkbox" id="has-pets" class="w-4 h-4 rounded text-orange-600">
+                                    </div>
+                                    <span class="text-[11px] font-bold text-gray-700 italic">The Pack</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submit-button" class="w-full py-5 btn-premium text-white font-black rounded-[1.5rem] transition-all uppercase tracking-widest text-sm italic">
+                            Generate My Strategy
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div id="message-box" class="mt-8 p-6 rounded-3xl hidden"></div>
+        </div>
+
+        <div class="flex-1 relative">
+            <div id="map"></div>
+            <button id="reset-button" class="absolute bottom-10 right-10 bg-white/90 backdrop-blur-md text-gray-800 px-8 py-4 rounded-full shadow-2xl font-black z-20 hidden flex items-center gap-3 hover:bg-white border border-gray-100 transition-all uppercase tracking-widest text-xs italic">
+                Clear Line
+            </button>
+        </div>
+    </div>
+
+    <!-- SURVEY VIEW (Personalization Form) -->
+    <div id="survey-view" class="hidden pt-24 min-h-screen bg-white overflow-y-auto px-6">
+        <div class="max-w-2xl mx-auto pb-20">
+            <div class="text-center mb-16">
+                <div class="w-24 h-24 bg-blue-100 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 text-blue-600 shadow-xl shadow-blue-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h2 class="text-5xl font-black text-gray-900 tracking-tighter mb-4 italic">The Safety Profile</h2>
+                <p class="text-gray-400 text-xl font-medium tracking-tight">Personalize your perimeter for the ones who matter most.</p>
+            </div>
+
+            <form id="survey-form" class="space-y-12">
+                <section class="bg-gray-50 p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+                    <h4 class="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-8 italic">01. Meet the Pack</h4>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-tighter">Who are we protecting? (Pets' Names)</label>
+                            <input type="text" id="survey-pet-names" placeholder="e.g. Luna & Bear" class="w-full p-5 rounded-2xl border border-gray-200 bg-white focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold text-lg">
+                        </div>
+                        <div class="p-6 bg-white rounded-2xl border border-gray-100 flex items-center justify-between">
+                            <span class="text-sm font-bold text-gray-700 font-black italic">Can we bring treats? 🦴</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="survey-treats" class="sr-only peer">
+                                <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-6 after:transition-all"></div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h4 class="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-6 italic">02. Access Requirements</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="option-card cursor-pointer">
+                            <input type="radio" name="gates" value="none" class="sr-only" checked>
+                            <div class="p-8 border-2 border-gray-100 rounded-[2.5rem] text-center transition-all bg-white hover:border-blue-100">
+                                <span class="block text-3xl mb-3">🚫</span>
+                                <span class="block font-black text-[10px] uppercase tracking-widest text-gray-900">Zero Gates</span>
+                            </div>
+                        </label>
+                        <label class="option-card cursor-pointer">
+                            <input type="radio" name="gates" value="required" id="survey-gates" class="sr-only">
+                            <div class="p-8 border-2 border-gray-100 rounded-[2.5rem] text-center transition-all bg-white hover:border-blue-100">
+                                <span class="block text-3xl mb-3">🚪</span>
+                                <span class="block font-black text-[10px] uppercase tracking-widest text-gray-900">Gates Needed</span>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="bg-blue-900 text-white p-10 rounded-[3.5rem] shadow-2xl">
+                    <h4 class="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-6 italic">03. Measurement Visit</h4>
+                    <div class="space-y-6">
+                        <p class="text-sm font-medium text-blue-100 leading-relaxed italic uppercase tracking-wider font-bold">Choose your preferred window for our specialist to confirm measurements.</p>
+                        <input type="datetime-local" id="survey-booking" class="w-full p-5 rounded-2xl bg-white/10 border border-white/20 text-white focus:bg-white/30 outline-none transition-all font-bold">
+                    </div>
+                </section>
+
+                <button type="submit" class="w-full py-6 btn-premium text-white font-black rounded-[2.5rem] transition-all uppercase tracking-widest text-sm italic shadow-2xl">
+                    Confirm My Strategy
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CRM VIEW -->
+    <div id="crm-view" class="hidden pt-16 h-screen bg-gray-50 flex overflow-hidden">
+        <div class="w-96 border-r border-gray-200 bg-white flex flex-col shadow-sm">
+            <div class="p-6 border-b border-gray-50">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black text-gray-900 tracking-tighter italic">Pipeline</h2>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-sync" title="Sync Database" class="p-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        </button>
+                        <span id="lead-count" class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-lg shadow-blue-100">0</span>
+                    </div>
+                </div>
+            </div>
+            <div id="lead-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <div class="text-center py-10 text-gray-400 font-medium italic">Loading leads...</div>
+            </div>
+        </div>
+
+        <div id="crm-workspace" class="flex-1 overflow-y-auto p-10">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center py-32 text-gray-300 uppercase tracking-[0.3em] italic" id="workspace-placeholder">
+                    <p class="text-xl font-black">Select a strategy to manage</p>
+                </div>
+                
+                <div id="lead-details" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div class="lg:col-span-2 space-y-8">
+                        <div id="lead-profile-card" class="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100 relative overflow-hidden"></div>
+                        
+                        <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest italic">Strategic Drip Campaign</h3>
+                                <button id="btn-copy-link" class="text-[10px] font-black text-blue-600 uppercase hover:underline">Copy Profile Link</button>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+                                <button id="btn-questionnaire" class="p-4 bg-blue-600 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-50 italic">Stage 1: Resend</button>
+                                <button id="btn-followup" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic">Stage 2: Secrets</button>
+                                <button id="btn-drip-3" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic font-black">Privacy Power</button>
+                                <button id="btn-drip-4" class="p-4 bg-gray-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all italic font-black">Final Nudge</button>
+                            </div>
+                            <div class="relative">
+                                <textarea id="manual-note" class="w-full p-6 bg-gray-50 border border-gray-100 rounded-[2.5rem] text-sm min-h-[140px] outline-none focus:ring-4 focus:ring-blue-50 font-medium leading-relaxed font-bold" placeholder="Record interaction notes..."></textarea>
+                                <button id="btn-save-note" class="mt-4 px-8 py-3 bg-gray-200 text-gray-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-300 transition-all italic font-black">Log Interaction</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100">
+                        <h3 class="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] mb-8 italic">History</h3>
+                        <div id="timeline-list" class="space-y-8 relative ml-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[9000] hidden">
+        <div class="bg-white p-10 rounded-[3rem] w-full max-w-sm shadow-2xl">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl mx-auto mb-6 shadow-xl shadow-blue-200 italic italic">E</div>
+            <h2 class="text-2xl font-black mb-2 text-center text-gray-900 tracking-tight italic font-black uppercase">Security Portal</h2>
+            <input type="password" id="crm-pass" placeholder="Authorization Token" class="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl mb-5 focus:ring-4 focus:ring-blue-50 outline-none text-center font-bold tracking-[0.3em]">
+            <button id="login-confirm" class="w-full py-5 btn-premium text-white font-black rounded-2xl uppercase tracking-widest italic text-sm font-black">Verify Identity</button>
+            <button id="login-cancel" class="w-full mt-4 py-2 text-gray-400 text-[10px] font-black uppercase tracking-widest font-black italic">Back to Site</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, arrayUnion, getDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- PUBLIC URL CONFIG ---
+        // Once you host on GitHub Pages, paste your live URL here.
+        const PUBLIC_APP_URL = ""; 
+
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const MAPS_API_KEY = "AIzaSyAWog64IMjzN-dQs6Kq4fNHB5JpEtsf4yo";
+        const GMAIL_BRIDGE_URL = "https://script.google.com/macros/s/AKfycbyJq0W3qg-wqv5YaMj1hhBpX5oqFh7tbpInqAwBXnapYOW9sMunG4712CWs0JJTMi70/exec"; 
+
+        let db, auth, map, polyline, markers = [], autocomplete, user, currentLead = null;
+        let fenceLengthMeters = 0;
+        const BASE_FEE = 500;
+        const COST_PER_METER = 150;
+
+        // AUTH & INIT
+        async function init() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                const authMethod = initialAuthToken ? signInWithCustomToken(auth, initialAuthToken) : signInAnonymously(auth);
+                await authMethod;
+
+                onAuthStateChanged(auth, (u) => { 
+                    user = u; 
+                    if (user) {
+                        checkUrlParams();
+                        loadMapsScript(); 
+                        loadPipeline();
+                    }
+                });
+                setupEventListeners();
+            } catch (err) {
+                console.error("Firebase Init Error:", err);
+            }
+        }
+
+        /**
+         * Robust absolute URL generation.
+         */
+        function getAbsoluteBaseUrl() {
+            if (PUBLIC_APP_URL && PUBLIC_APP_URL.length > 5) {
+                return PUBLIC_APP_URL.replace(/\/$/, "");
+            }
+            // Logic for sandboxes: captures the exact session-based address
+            let currentUrl = new URL(window.location.href);
+            currentUrl.search = ""; 
+            return currentUrl.toString().replace(/\/$/, "");
+        }
+
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const view = params.get('view');
+            const leadId = params.get('leadId');
+            if (view === 'survey' && leadId) showSurvey(leadId);
+        }
+
+        async function showSurvey(leadId) {
+            document.getElementById('customer-view').classList.add('hidden');
+            document.getElementById('crm-view').classList.add('hidden');
+            document.getElementById('survey-view').classList.remove('hidden');
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'fence_leads', leadId);
+                const leadSnap = await getDoc(docRef);
+                if (leadSnap.exists()) {
+                    const data = leadSnap.data();
+                    document.querySelector('#survey-view h2').textContent = `Hi ${data.name.split(' ')[0]}, let's secure the home.`;
+                }
+            } catch (e) { console.error(e); }
+
+            document.getElementById('survey-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                btn.disabled = true; btn.textContent = "Updating Strategy...";
+                const updateData = {
+                    petsNames: document.getElementById('survey-pet-names').value,
+                    allowTreats: document.getElementById('survey-treats').checked,
+                    needsGates: document.querySelector('input[name="gates"]:checked').value === 'required',
+                    bookingRequested: document.getElementById('survey-booking').value,
+                    status: 'Profile Complete',
+                    history: arrayUnion({ text: 'Customer finalized Safety Profile', type: 'system', date: new Date().toISOString() })
+                };
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'fence_leads', leadId);
+                    await updateDoc(docRef, updateData);
+                    document.getElementById('survey-view').innerHTML = `<div class="text-center py-32 animate-in zoom-in duration-700"><div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-green-600 shadow-xl shadow-green-50"><svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></div><h2 class="text-5xl font-black text-gray-900 tracking-tighter mb-4 italic uppercase">Strategy Confirmed.</h2><p class="text-gray-400 text-xl font-medium tracking-tight">We will call you shortly to confirm the Measurement Visit.</p></div>`;
+                } catch (err) { btn.disabled = false; }
+            };
+        }
+
+        /**
+         * Top-Tier Email Template (Bulletproof Table-Based Layout)
+         */
+        function generateEmailHtml(name, content, ctaText = null, ctaLink = null) {
+            return `
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 40px; overflow: hidden; color: #1e293b; background-color: #f8fafc; border: 1px solid #e2e8f0; padding-bottom: 20px;">
+                <div style="background-color: #2563eb; padding: 60px 20px; text-align: center;">
+                    <div style="display: inline-block; background-color: #ffffff; color: #2563eb; width: 44px; height: 44px; border-radius: 12px; line-height: 44px; font-weight: 900; font-size: 22px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">E</div>
+                    <h1 style="color: #ffffff; margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; font-style: italic;">Expanse Builders</h1>
+                </div>
+                <div style="padding: 60px 40px; background-color: #ffffff; border-radius: 40px 40px 0 0; margin-top: -35px;">
+                    <h2 style="font-size: 30px; color: #0f172a; margin-top: 0; font-weight: 900; letter-spacing: -1.5px; font-style: italic;">Hey ${name.split(' ')[0]} 👋</h2>
+                    <div style="line-height: 1.8; font-size: 16px; color: #475569; font-weight: 500;">${content}</div>
+                    
+                    ${ctaText && ctaLink ? `
+                    <div style="margin-top: 50px; text-align: center;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="center">
+                                    <table border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td align="center" bgcolor="#2563eb" style="border-radius: 20px;">
+                                                <a href="${ctaLink}" target="_blank" style="padding: 22px 48px; font-size: 14px; font-family: sans-serif; color: #ffffff; text-decoration: none; font-weight: 900; display: inline-block; text-transform: uppercase; letter-spacing: 2px; font-style: italic;">
+                                                    ${ctaText}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>` : ''}
+                    <p style="margin-top: 60px; font-size: 14px; color: #94a3b8; text-align: center; font-style: italic; border-top: 1px solid #f1f5f9; padding-top: 40px;">Protecting your Pack since 2024.</p>
+                </div>
+                ${ctaLink ? `<div style="padding: 20px 40px; text-align: center;"><p style="font-size: 10px; color: #cbd5e1; margin-bottom: 5px;">If the button above does not work, copy and paste this link:</p><p style="font-size: 10px; color: #3b82f6; word-break: break-all;">${ctaLink}</p></div>` : ''}
+                <div style="padding: 10px 30px 40px 30px; text-align: center;"><p style="margin: 0; font-size: 10px; color: #cbd5e1; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">Expanse Builders &copy; 2026 | Built for the Pack</p></div>
+            </div>`;
+        }
+
+        async function sendGmail(to, subject, bodyHtml) {
+            if (!GMAIL_BRIDGE_URL) return false;
+            try {
+                const r = await fetch(GMAIL_BRIDGE_URL, { method: 'POST', body: JSON.stringify({ to, subject, body: bodyHtml }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+                return r.ok;
+            } catch (err) { return false; }
+        }
+
+        function loadMapsScript() {
+            if (window.google) return;
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=geometry,places&callback=initMap`;
+            script.async = true; document.head.appendChild(script); window.initMap = initMap;
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -33.8688, lng: 151.2093 }, zoom: 12, mapTypeId: 'satellite', tilt: 0, 
+                mapTypeControl: false, streetViewControl: false, styles: [{ featureType: 'all', stylers: [{ saturation: -100 }] }]
+            });
+            polyline = new google.maps.Polyline({ strokeColor: '#2563eb', strokeOpacity: 0.9, strokeWeight: 6, map: map });
+            autocomplete = new google.maps.places.Autocomplete(document.getElementById('address-search'), { types: ['address'], componentRestrictions: { country: 'AU' }, fields: ['geometry', 'formatted_address'] });
+            autocomplete.addListener('place_changed', () => { const p = autocomplete.getPlace(); if (p.geometry) { map.setCenter(p.geometry.location); map.setZoom(20); resetLine(); } });
+            map.addListener('click', (e) => {
+                if (markers.length >= 2) resetLine();
+                const m = new google.maps.Marker({ position: e.latLng, map: map, icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: markers.length === 0 ? '#10b981' : '#ef4444', fillOpacity: 1, scale: 9, strokeColor: 'white', strokeWeight: 3 } });
+                markers.push(m); polyline.setPath(markers.map(m => m.getPosition()));
+                if (markers.length === 2) { fenceLengthMeters = google.maps.geometry.spherical.computeLength(polyline.getPath()); updateCustomerUI(); }
+            });
+        }
+
+        function resetLine() { markers.forEach(m => m.setMap(null)); markers = []; polyline.setPath([]); fenceLengthMeters = 0; updateCustomerUI(); }
+
+        function updateCustomerUI() {
+            document.getElementById('length-display').textContent = `${fenceLengthMeters.toFixed(2)} m`;
+            const est = fenceLengthMeters > 0 ? (fenceLengthMeters * COST_PER_METER) + BASE_FEE : 0;
+            document.getElementById('estimate-display').textContent = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(est);
+            document.getElementById('lead-form-container').classList.toggle('hidden', fenceLengthMeters === 0);
+            document.getElementById('reset-button').classList.toggle('hidden', markers.length === 0);
+        }
+
+        let pipelineUnsub = null;
+        function loadPipeline() {
+            if (!user) return;
+            const q = collection(db, 'artifacts', appId, 'public', 'data', 'fence_leads');
+            if (pipelineUnsub) pipelineUnsub();
+            pipelineUnsub = onSnapshot(q, (snapshot) => {
+                const list = document.getElementById('lead-list'); list.innerHTML = ''; const leads = [];
+                snapshot.forEach(d => leads.push({ id: d.id, ...d.data() }));
+                leads.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                document.getElementById('lead-count').textContent = leads.length;
+                leads.forEach(lead => {
+                    const el = document.createElement('div'); const prio = lead.hasKids || lead.hasPets;
+                    el.className = `lead-card p-6 rounded-[2.5rem] border cursor-pointer transition-all ${currentLead?.id === lead.id ? 'bg-blue-50 border-blue-100 shadow-xl ring-8 ring-blue-50/50' : 'bg-white border-gray-100'}`;
+                    el.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="font-black text-gray-900 italic font-black uppercase">${lead.name}</span>${prio ? '<span class="bg-orange-100 text-orange-600 text-[8px] font-black px-2 py-1 rounded-full uppercase">Prio</span>' : ''}</div><p class="text-[10px] text-gray-400 font-bold uppercase truncate italic">${lead.address}</p>`;
+                    el.onclick = () => selectLead(lead); list.appendChild(el);
+                    if (currentLead?.id === lead.id) currentLead = lead;
+                });
+                if (currentLead) renderLeadWorkspace();
+            });
+        }
+
+        function selectLead(lead) { currentLead = lead; renderLeadWorkspace(); loadPipeline(); }
+
+        function renderLeadWorkspace() {
+            document.getElementById('workspace-placeholder').classList.add('hidden');
+            document.getElementById('lead-details').classList.remove('hidden');
+            document.getElementById('lead-profile-card').innerHTML = `<div class="flex justify-between items-start mb-10"><div><h2 class="text-4xl font-black text-gray-900 brand-font tracking-tighter italic uppercase font-black">${currentLead.name}</h2><p class="text-blue-600 font-bold uppercase text-[10px] tracking-[0.2em] font-bold italic">${currentLead.address}</p></div><span class="bg-blue-600 text-white px-5 py-2 rounded-full font-black text-[10px] uppercase tracking-widest italic font-black">${currentLead.status || 'Draft'}</span></div><div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10"><div class="p-6 bg-gray-50 rounded-[2.5rem] border border-gray-100"><p class="text-[9px] font-black text-gray-300 uppercase mb-2 italic">The Pack</p><p class="text-sm font-black text-gray-900 truncate font-black font-black">${currentLead.petsNames || 'Pending...'}</p></div><div class="p-6 bg-gray-50 rounded-[2.5rem] border border-gray-100"><p class="text-[9px] font-black text-gray-300 uppercase mb-2 italic">Treats</p><p class="text-sm font-black text-gray-900 uppercase font-black">${currentLead.allowTreats ? 'YES' : 'NO'}</p></div><div class="p-6 bg-gray-50 rounded-[2.5rem] border border-gray-100"><p class="text-[9px] font-black text-gray-300 uppercase mb-2 italic">Gates</p><p class="text-sm font-black text-gray-900 uppercase font-black font-black">${currentLead.needsGates ? 'REQUIRED' : 'NONE'}</p></div><div class="p-6 bg-blue-50 rounded-[2.5rem] border border-blue-100"><p class="text-[9px] font-black text-blue-300 uppercase mb-2 italic tracking-widest font-black">Booking</p><p class="text-[10px] font-black text-blue-600 uppercase leading-tight font-black">${currentLead.bookingRequested ? new Date(currentLead.bookingRequested).toLocaleString() : 'TBD'}</p></div></div>`;
+            const t = document.getElementById('timeline-list'); t.innerHTML = '';
+            (currentLead.history || []).sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(i => {
+                const el = document.createElement('div'); el.className = 'timeline-item relative pl-10';
+                el.innerHTML = `<p class="text-[11px] font-black text-gray-800 italic font-black">${i.text}</p><p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1 font-bold italic">${new Date(i.date).toLocaleString()}</p>`;
+                t.appendChild(el);
+            });
+        }
+
+        async function logActivity(text, type = 'note') {
+            if (!user || !currentLead) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'fence_leads', currentLead.id);
+            await updateDoc(docRef, { history: arrayUnion({ text, type, date: new Date().toISOString() }) });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('view-toggle-btn').onclick = () => {
+                const c = document.getElementById('crm-view'); const isC = !c.classList.contains('hidden');
+                c.classList.toggle('hidden', isC); document.getElementById('customer-view').classList.toggle('hidden', !isC);
+                document.getElementById('survey-view').classList.add('hidden');
+                if (!isC) document.getElementById('login-modal').classList.remove('hidden');
+                else document.getElementById('view-toggle-btn').textContent = "CRM Access";
+            };
+            document.getElementById('login-confirm').onclick = () => { if (document.getElementById('crm-pass').value === 'fence123') { document.getElementById('login-modal').classList.add('hidden'); document.getElementById('view-toggle-btn').textContent = "Back to Site"; loadPipeline(); } };
+            document.getElementById('btn-sync').onclick = loadPipeline;
+
+            document.getElementById('lead-capture-form').onsubmit = async (e) => {
+                e.preventDefault(); if (!user) return;
+                const submitBtn = document.getElementById('submit-button'); submitBtn.disabled = true; submitBtn.textContent = "Processing...";
+                const data = {
+                    timestamp: new Date().toISOString(), name: document.getElementById('name').value, email: document.getElementById('email').value, phone: document.getElementById('phone').value,
+                    address: document.getElementById('address-search').value, fenceLength: fenceLengthMeters.toFixed(2),
+                    estimate: (fenceLengthMeters * COST_PER_METER) + BASE_FEE, hasKids: document.getElementById('has-kids').checked,
+                    hasPets: document.getElementById('has-pets').checked, status: 'Strategy Drafted', history: [{ text: 'Perimeter Design Initiated', type: 'system', date: new Date().toISOString() }]
+                };
+                try {
+                    const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fence_leads'), data);
+                    const surveyLink = `${getAbsoluteBaseUrl()}?view=survey&leadId=${docRef.id}`;
+                    const html = generateEmailHtml(data.name, `<p>We've received your strategy for <strong>${data.address}</strong>.</p><p>We've flagged this as a <strong>Priority Safety Perimeter</strong>. Click below to tell us about your pets and find a time for your measurement visit.</p>`, "Open Safety Profile", surveyLink);
+                    await sendGmail(data.email, "Action Required: Your Safety Perimeter Profile", html);
+                    document.getElementById('message-box').classList.remove('hidden');
+                    document.getElementById('message-box').className = "mt-8 p-10 rounded-[3rem] bg-blue-600 text-white shadow-2xl";
+                    document.getElementById('message-box').innerHTML = `<h4 class="font-black text-2xl mb-2 italic uppercase font-black">STRATEGY SECURED.</h4><p class="text-sm font-bold opacity-90 leading-relaxed font-bold italic">Check your inbox. Complete your Safety Profile to secure your priority window.</p>`;
+                    document.getElementById('lead-capture-form').classList.add('hidden');
+                    loadPipeline();
+                } catch (err) { submitBtn.disabled = false; submitBtn.textContent = "Generate My Strategy"; }
+            };
+
+            document.getElementById('btn-copy-link').onclick = () => { if (!currentLead) return; const link = `${getAbsoluteBaseUrl()}?view=survey&leadId=${currentLead.id}`; const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); };
+            document.getElementById('btn-questionnaire').onclick = async () => { const surveyLink = `${getAbsoluteBaseUrl()}?view=survey&leadId=${currentLead.id}`; const html = generateEmailHtml(currentLead.name, `<p>We're ready to design your perimeter at <strong>${currentLead.address}</strong>.</p><p>Please finalize your Safety Profile details below.</p>`, "Open Safety Profile", surveyLink); if (await sendGmail(currentLead.email, "Action Required: Your Safety Profile", html)) logActivity('Resent Safety Profile link', 'email'); };
+            document.getElementById('btn-followup').onclick = async () => { const html = generateEmailHtml(currentLead.name, `<p>Did you know that 85% of home security starts at the perimeter?</p><p>A sturdy fence creates a psychological barrier that protects what's inside. Shall we proceed?</p>`, "Secure My Home", "mailto:info@expanse.builders"); if (await sendGmail(currentLead.email, "5 Secrets to Perimeter Security", html)) logActivity('Sent Drip 2: Security Secrets', 'email'); };
+            document.getElementById('btn-drip-3').onclick = async () => { const html = generateEmailHtml(currentLead.name, `<p>Privacy isn't just about hiding—it's about feeling truly at home.</p><p>Imagine your yard as an acoustic sanctuary. That's the power of premium paling.</p>`, "See Our Work", "https://expanse.builders"); if (await sendGmail(currentLead.email, "The Value of Privacy", html)) logActivity('Sent Drip 3: Privacy Advantage', 'email'); };
+            document.getElementById('btn-drip-4').onclick = async () => { const html = generateEmailHtml(currentLead.name, `<p>We have a measurement gap near <strong>${currentLead.address}</strong> next week.</p><p>Shall we swing by?</p>`, "Lock in Measure-Up", "mailto:info@expanse.builders"); if (await sendGmail(currentLead.email, "Final Nudge: Measure Route Closing", html)) logActivity('Sent Drip 4: Final Nudge', 'email'); };
+            document.getElementById('btn-save-note').onclick = () => { const n = document.getElementById('manual-note'); if (n.value) { logActivity(`Strategic Note: ${n.value}`, 'note'); n.value = ''; } };
+            document.getElementById('reset-button').onclick = resetLine;
+        }
+        init();
+    </script>
+</body>
+</html>
